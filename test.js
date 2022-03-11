@@ -72,6 +72,34 @@ if (cluster.isPrimary) {
 
   console.log(`Worker ${process.pid} started`);
 }*/
+Le module net permet de créer des sockets TCP. A quoi servent les sockets ? réaliser un cas d’usage en créant un client et un serveur.
+// creation server
+
+const http2 = require('http2');
+
+const server = http2.createServer();
+server.on('session', (session) => {
+  // Set altsvc for origin https://example.org:80
+  session.altsvc('h2=":8000"', 'https://example.org:80');
+});
+
+server.on('stream', (stream) => {
+  // Set altsvc for a specific stream
+  stream.session.altsvc('h2=":8000"', stream.id);
+});
+
+// creation client
+const http2 = require('http2');
+const client = http2.connect('https://example.org');
+
+client.on('altsvc', (alt, origin, streamId) => {
+  console.log(alt);
+  console.log(origin);
+  console.log(streamId);
+});
+
+
+
 
 // creation client
 const http2 = require('http2');
